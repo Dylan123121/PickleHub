@@ -23,7 +23,6 @@ local camera = workspace.CurrentCamera
 local eggFolder = workspace:WaitForChild("eggSpawns")
 local dummiesFolder = workspace:WaitForChild("dummies")
 local promotePart = workspace:WaitForChild("promotePart")
-local bronzePart = workspace:WaitForChild("bronzePart")
 
 -- STATE
 local autoTeleporting = false
@@ -36,7 +35,6 @@ local appleRunning = false
 local baseRunning = false
 
 local promoteRunning = false
-local bronzePartRunning = false
 local aimEnabled = false
 
 local target = nil
@@ -44,6 +42,7 @@ local delay = 3
 local weapon = "Burst Rifle"
 local id1 = ""
 local id2 = ""
+local idLMG = ""
 
 -- TABS
 local FarmTab = Window:MakeTab({Name = "Farming", Icon = "rbxassetid://4483345998"})
@@ -60,6 +59,7 @@ FarmTab:AddToggle({
 	end
 })
 
+-- ✅ PROMOTE (ORIGINAL METHOD)
 FarmTab:AddToggle({
 	Name = "Auto Promote",
 	Default = false,
@@ -72,26 +72,6 @@ FarmTab:AddToggle({
 					local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
 					if hrp then
 						promotePart.CFrame = hrp.CFrame * CFrame.new(0,-3,0)
-					end
-					task.wait(0.2)
-				end
-			end)
-		end
-	end
-})
-
-FarmTab:AddToggle({
-	Name = "Auto Bronze Part",
-	Default = false,
-	Callback = function(v)
-		bronzePartRunning = v
-
-		if v then
-			task.spawn(function()
-				while bronzePartRunning do
-					local hrp = player.Character and player.Character:FindFirstChild("HumanoidRootPart")
-					if hrp then
-						bronzePart.CFrame = hrp.CFrame * CFrame.new(0,-3,0)
 					end
 					task.wait(0.2)
 				end
@@ -138,6 +118,16 @@ UpgradeTab:AddTextbox({
 	end
 })
 
+UpgradeTab:AddTextbox({
+	Name = "LMG ID",
+	Default = "",
+	TextDisappear = false,
+	Callback = function(val)
+		idLMG = val
+	end
+})
+
+-- UPDATE STATS
 UpgradeTab:AddToggle({
 	Name = "Update Stats",
 	Default = false,
@@ -147,8 +137,15 @@ UpgradeTab:AddToggle({
 		if v then
 			task.spawn(function()
 				while updateStatsRunning do
-					remotes.updateStatsEvent:FireServer(id1, true, weapon)
-					remotes.updateStatsEvent:FireServer(id2, false, "Scar")
+					if id1 ~= "" then
+						remotes.updateStatsEvent:FireServer(id1, true, weapon)
+					end
+					if id2 ~= "" then
+						remotes.updateStatsEvent:FireServer(id2, false, "Scar")
+					end
+					if idLMG ~= "" then
+						remotes.updateStatsEvent:FireServer(idLMG, true, "LMG")
+					end
 					task.wait(delay)
 				end
 			end)
@@ -156,6 +153,7 @@ UpgradeTab:AddToggle({
 	end
 })
 
+-- CASINGS
 UpgradeTab:AddToggle({
 	Name = "Casings",
 	Default = false,
@@ -179,6 +177,7 @@ UpgradeTab:AddToggle({
 	end
 })
 
+-- BRONZE
 UpgradeTab:AddToggle({
 	Name = "Bronze",
 	Default = false,
@@ -199,6 +198,7 @@ UpgradeTab:AddToggle({
 	end
 })
 
+-- APPLE
 UpgradeTab:AddToggle({
 	Name = "Apple",
 	Default = false,
@@ -219,6 +219,7 @@ UpgradeTab:AddToggle({
 	end
 })
 
+-- BASE
 UpgradeTab:AddToggle({
 	Name = "Base",
 	Default = false,
